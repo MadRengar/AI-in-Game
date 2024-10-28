@@ -29,22 +29,27 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
     public RHEAPlayer(RHEAParams params) {
         super(params, "RHEAPlayer");
     }
-
+    /**返回 RHEAParams 类型的对象，表示该玩家的参数。**/
     @Override
     public RHEAParams getParameters() {
+        System.out.println("执行：getParameters！获得玩家的参数!");
         return (RHEAParams) parameters;
     }
+
+    /**初始化玩家**/
     @Override
     public void initializePlayer(AbstractGameState state) {
-        MASTStatistics = new ArrayList<>();
+        System.out.println("执行：initializePlayer！初始化玩家!");
+        MASTStatistics = new ArrayList<>();//创建 MASTStatistics（多臂老虎机算法的统计数据）用于记录动作的访问次数和累计价值
         for (int i = 0; i < state.getNPlayers(); i++)
             MASTStatistics.add(new HashMap<>());
-        population = new ArrayList<>();
+        population = new ArrayList<>();//初始化种群 population，表示演化算法的初始个体集。
     }
-
+    /**这是关键的决策函数，在游戏状态下通过演化算法选择下一步的动作**/
     @Override
     public AbstractAction _getAction(AbstractGameState stateObs, List<AbstractAction> possibleActions) {
-        ElapsedCpuTimer timer = new ElapsedCpuTimer();  // New timer for this game tick
+        System.out.println("执行：_getAction！选择下一步的动作!");
+        ElapsedCpuTimer timer = new ElapsedCpuTimer();  // New timer for this game tick使用定时器 ElapsedCpuTimer 来确保算法不会超时
         timer.setMaxTimeMillis(parameters.budget);
         numIters = 0;
         fmCalls = 0;
@@ -52,7 +57,7 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
         repairCount = 0;
         nonRepairCount = 0;
         RHEAParams params = getParameters();
-
+        /**首先根据参数进行种群的初始化或左移操作 然后运行演化过程来改进种群，并最终选择表现最好的个体的第一个动作作为返回值。**/
         if (params.useMAST) {
             if (MASTStatistics == null) {
                 MASTStatistics = new ArrayList<>();
@@ -92,6 +97,7 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
         population.sort(Comparator.naturalOrder());
         initTime = timer.elapsedMillis();
         // Run evolution
+        /**演化过程：每轮迭代会调用 runIteration 函数来优化种群**/
         while (budgetLeft(timer)) {
             runIteration();
         }
@@ -105,8 +111,11 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
             throw new AssertionError("Action chosen is not legitimate " + numIters + ", " + params.shiftLeft);
         return retValue;
     }
-
+    /**检查当前是否还剩下预算来继续执行演化（预算可以是时间、调用次数、迭代次数等）。
+     * 根据不同的预算类型（时间、前向模型调用次数等）来判断是否继续迭代。
+     * **/
     private boolean budgetLeft(ElapsedCpuTimer timer) {
+        System.out.println("执行：检查剩余预算！");
         RHEAParams params = getParameters();
         if (params.budgetType == PlayerConstants.BUDGET_TIME) {
             long remaining = timer.remainingTimeMillis();
@@ -122,7 +131,7 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
         }
         throw new AssertionError("This should be unreachable : " + params.budgetType);
     }
-
+    /**创建并返回 RHEAPlayer 的一个副本，用于并行计算或多次运行时的玩家状态复制。**/
     @Override
     public RHEAPlayer copy() {
         RHEAParams newParams = (RHEAParams) parameters.copy();
@@ -131,7 +140,7 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
         retValue.setForwardModel(getForwardModel().copy());
         return retValue;
     }
-
+    /**交叉两个个体（父代）的基因，根据不同的交叉类型（如单点、双点、均匀交叉），生成新的子代。**/
     private RHEAIndividual crossover(RHEAIndividual p1, RHEAIndividual p2) {
         switch (getParameters().crossoverType) {
             case NONE: // we just take the first parent
@@ -146,7 +155,7 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
                 throw new RuntimeException("Unexpected crossover type");
         }
     }
-
+    /**执行均匀交叉，逐位随机选择两个父代中的动作，生成子代。**/
     private RHEAIndividual uniformCrossover(RHEAIndividual p1, RHEAIndividual p2) {
         RHEAIndividual child = new RHEAIndividual(p1);
         copyCalls += child.length;
@@ -159,7 +168,7 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
         }
         return child;
     }
-
+    /**执行单点交叉，从某个点开始，取其中一个父代的基因，生成子代。**/
     private RHEAIndividual onePointCrossover(RHEAIndividual p1, RHEAIndividual p2) {
         RHEAIndividual child = new RHEAIndividual(p1);
         copyCalls += child.length;
@@ -171,7 +180,7 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
         }
         return child;
     }
-
+    /**执行单点交叉，从某个点开始，取其中一个父代的基因，生成子代。**/
     private RHEAIndividual twoPointCrossover(RHEAIndividual p1, RHEAIndividual p2) {
         RHEAIndividual child = new RHEAIndividual(p1);
         copyCalls += child.length;
@@ -184,7 +193,7 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
         }
         return child;
     }
-
+    /**选择两个个体作为父代，使用不同的选择机制（如锦标赛选择、排名选择）。**/
     RHEAIndividual[] selectParents() {
         RHEAIndividual[] parents = new RHEAIndividual[2];
 
@@ -203,7 +212,7 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
 
         return parents;
     }
-
+    /**锦标赛选择，从种群中随机挑选若干个体，然后选出表现最好的个体作为父代。**/
     RHEAIndividual tournamentSelection() {
         RHEAIndividual best = null;
         for (int i = 0; i < getParameters().tournamentSize; ++i) {
@@ -215,7 +224,7 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
         }
         return best;
     }
-
+    /**排名选择，将个体按表现排序，基于排名进行选择，排名高的个体有更高的概率被选为父代。**/
     RHEAIndividual rankSelection() {
         population.sort(Comparator.naturalOrder());
         int rankSum = 0;
@@ -233,8 +242,10 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
 
     /**
      * Run evolutionary process for one generation
+     * 进行一代演化，包括精英保留、交叉操作、变异操作、修复操作（如果需要），并通过 MAST 更新统计数据。最后更新种群和预算。
      */
     private void runIteration() {
+        System.out.println("执行：runIteration！优化种群!");
         //copy elites
         RHEAParams params = getParameters();
         List<RHEAIndividual> newPopulation = new ArrayList<>();
@@ -273,8 +284,9 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
         numIters++;
     }
 
-
+    /**更新 MASTStatistics，即记录每个动作的访问次数和累计价值，用于多臂老虎机算法的改进。**/
     protected void MASTBackup(AbstractAction[] rolloutActions, double delta, int player) {
+        System.out.println("执行：MASTBackup！记录每个动作的访问次数和累计价值！");
         for (int i = 0; i < rolloutActions.length; i++) {
             AbstractAction action = rolloutActions[i];
             if (action == null)
@@ -286,15 +298,17 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
         }
     }
 
-
+    /**设置该玩家的预算（如时间、调用次数等），并将其保存到参数中。**/
     @Override
     public void setBudget(int budget) {
+        System.out.println("执行：setBudget！设置该玩家的预算！");
         parameters.budget = budget;
         parameters.setParameterValue("budget", budget);
     }
-
+    /**返回玩家当前的预算值。**/
     @Override
     public int getBudget() {
+        System.out.println("执行：getBudget！返回玩家当前的预算值！");
         return parameters.budget;
     }
 }

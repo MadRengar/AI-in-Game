@@ -1,0 +1,33 @@
+Game: SushiGo, Players: 2, Mode: RANDOM, TotalGames: 100, GamesPerMatchup: 1
+mcts got 100.00 points. mcts won 100.0% of the 100 games of the tournament. mcts won 100.0% of the 100 games it played during the tournament.
+mcts won 100.0% of the 100 games against rhea.
+
+rhea got 0.00 points. rhea won 0.0% of the 100 games of the tournament. rhea won 0.0% of the 100 games it played during the tournament.
+rhea won 0.0% of the 100 games against mcts.
+
+---- Ranking ---- (+/- are standard errors on the mean calculated using a Normal approximation) 
+mcts: Win rate 1.00 +/- 0.000	Mean Ordinal 1.00 +/- 0.00
+rhea: Win rate 0.00 +/- 0.000	Mean Ordinal 2.00 +/- 0.00
+
+Game: SushiGo, Players: 2, Mode: RANDOM, TotalGames: 50, GamesPerMatchup: 1
+mcts got 44.00 points. mcts won 88.0% of the 50 games of the tournament. mcts won 88.0% of the 50 games it played during the tournament.
+mcts won 88.0% of the 50 games against rhea.
+
+rhea got 6.00 points. rhea won 12.0% of the 50 games of the tournament. rhea won 12.0% of the 50 games it played during the tournament.
+rhea won 12.0% of the 50 games against mcts.
+
+---- Ranking ---- (+/- are standard errors on the mean calculated using a Normal approximation) 
+mcts: Win rate 0.88 +/- 0.046	Mean Ordinal 1.12 +/- 0.05
+rhea: Win rate 0.12 +/- 0.046	Mean Ordinal 1.88 +/- 0.05
+
+Game: SushiGo, Players: 2, Mode: RANDOM, TotalGames: 50, GamesPerMatchup: 1
+mcts got 47.00 points. mcts won 94.0% of the 50 games of the tournament. mcts won 94.0% of the 50 games it played during the tournament.
+mcts won 94.0% of the 50 games against rhea.
+
+rhea got 3.00 points. rhea won 6.0% of the 50 games of the tournament. rhea won 6.0% of the 50 games it played during the tournament.
+rhea won 6.0% of the 50 games against mcts.
+
+---- Ranking ---- (+/- are standard errors on the mean calculated using a Normal approximation) 
+mcts: Win rate 0.94 +/- 0.034	Mean Ordinal 1.06 +/- 0.03
+rhea: Win rate 0.06 +/- 0.034	Mean Ordinal 1.94 +/- 0.03
+
