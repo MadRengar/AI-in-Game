@@ -1,33 +1,52 @@
-Game: SushiGo, Players: 2, Mode: RANDOM, TotalGames: 100, GamesPerMatchup: 1
-mcts got 100.00 points. mcts won 100.0% of the 100 games of the tournament. mcts won 100.0% of the 100 games it played during the tournament.
-mcts won 100.0% of the 100 games against rhea.
-
-rhea got 0.00 points. rhea won 0.0% of the 100 games of the tournament. rhea won 0.0% of the 100 games it played during the tournament.
 rhea won 0.0% of the 100 games against mcts.
 
----- Ranking ---- (+/- are standard errors on the mean calculated using a Normal approximation) 
-mcts: Win rate 1.00 +/- 0.000	Mean Ordinal 1.00 +/- 0.00
-rhea: Win rate 0.00 +/- 0.000	Mean Ordinal 2.00 +/- 0.00
-
-Game: SushiGo, Players: 2, Mode: RANDOM, TotalGames: 50, GamesPerMatchup: 1
-mcts got 44.00 points. mcts won 88.0% of the 50 games of the tournament. mcts won 88.0% of the 50 games it played during the tournament.
-mcts won 88.0% of the 50 games against rhea.
-
-rhea got 6.00 points. rhea won 12.0% of the 50 games of the tournament. rhea won 12.0% of the 50 games it played during the tournament.
 rhea won 12.0% of the 50 games against mcts.
 
----- Ranking ---- (+/- are standard errors on the mean calculated using a Normal approximation) 
-mcts: Win rate 0.88 +/- 0.046	Mean Ordinal 1.12 +/- 0.05
-rhea: Win rate 0.12 +/- 0.046	Mean Ordinal 1.88 +/- 0.05
+rhea won 6.0% of the 50 games against mcts.
+//----------------------Test------------------------------//
+//改变了：每一代参加精英筛选的个数eliteCount": 4（保留最佳个体的数量，建议选择比当前稍大一点的 4 或 6，以避免过早丢失优质个体，保持多样性。）
+//增大了种群个数"populationSize": 14（在初始化和生成候选解时，较大的种群可能会带来更多样的解。建议使用稍大值）
+rhea won 12.0% of the 50 games against mcts.
 
-Game: SushiGo, Players: 2, Mode: RANDOM, TotalGames: 50, GamesPerMatchup: 1
-mcts got 47.00 points. mcts won 94.0% of the 50 games of the tournament. mcts won 94.0% of the 50 games it played during the tournament.
-mcts won 94.0% of the 50 games against rhea.
-
-rhea got 3.00 points. rhea won 6.0% of the 50 games of the tournament. rhea won 6.0% of the 50 games it played during the tournament.
+//----------------------Test------------------------------//
+//populationSize：20  horizon：10
+rhea won 4.0% of the 50 games against mcts.
 rhea won 6.0% of the 50 games against mcts.
 
+//----------------------Test------------------------------//
+//populationSize：20 回调horizon：7
+rhea won 2.0% of the 50 games against mcts.
+
+//----------------------Test------------------------------//
+//populationSize：14 horizon：7 eliteCount：4
+rhea won 12.0% of the 50 games against mcts.
+//----------------------Test------------------------------//
+//添加：动态突变基因个数
+rhea won 4.0% of the 50 games against mcts.
+rhea won 6.0% of the 50 games against mcts.
+//----------------------Test_两个rhea对战------------------------------//
+rhea got 12.00 points. rhea won 24.0% of the 50 games of the tournament. rhea won 24.0% of the 50 games it played during the tournament.
+rhea won 24.0% of the 50 games against rhea_test.
+
+rhea_test got 38.00 points. rhea_test won 76.0% of the 50 games of the tournament. rhea_test won 76.0% of the 50 games it played during the tournament.
+rhea_test won 76.0% of the 50 games against rhea.
+
+
+rhea got 26.00 points. rhea won 52.0% of the 50 games of the tournament. rhea won 52.0% of the 50 games it played during the tournament.
+rhea won 52.0% of the 50 games against rhea_test.
+
+rhea_test got 24.00 points. rhea_test won 48.0% of the 50 games of the tournament. rhea_test won 48.0% of the 50 games it played during the tournament.
+rhea_test won 48.0% of the 50 games against rhea.
+
+
+Game: SushiGo, Players: 2, Mode: RANDOM, TotalGames: 50, GamesPerMatchup: 1
+rhea got 18.50 points. rhea won 36.0% of the 50 games of the tournament. rhea won 36.0% of the 50 games it played during the tournament.
+rhea won 36.0% of the 50 games against rhea_test.
+
+rhea_test got 31.50 points. rhea_test won 62.0% of the 50 games of the tournament. rhea_test won 62.0% of the 50 games it played during the tournament.
+rhea_test won 62.0% of the 50 games against rhea.
+
 ---- Ranking ---- (+/- are standard errors on the mean calculated using a Normal approximation) 
-mcts: Win rate 0.94 +/- 0.034	Mean Ordinal 1.06 +/- 0.03
-rhea: Win rate 0.06 +/- 0.034	Mean Ordinal 1.94 +/- 0.03
+rhea_test: Win rate 0.63 +/- 0.068	Mean Ordinal 1.36 +/- 0.07
+rhea: Win rate 0.37 +/- 0.068	Mean Ordinal 1.62 +/- 0.07
 

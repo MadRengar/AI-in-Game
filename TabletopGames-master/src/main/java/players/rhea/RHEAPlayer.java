@@ -26,13 +26,19 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
     protected int repairCount, nonRepairCount;
     private MASTPlayer mastPlayer;
 
+    private double prevBestValue;
+    private double currentBestValue;
+    private final double minMutationCount = 1;
+    private final double maxMutationCount = 5;
+    private final double increaseFactor = 1.2;
+    private final double decreaseFactor = 0.8;
+
     public RHEAPlayer(RHEAParams params) {
         super(params, "RHEAPlayer");
     }
-    /**返回 RHEAParams 类型的对象，表示该玩家的参数。**/
+    /**返回 RHEAParams 类型的对象，表示该玩家的参数。会被频繁调用**/
     @Override
     public RHEAParams getParameters() {
-        System.out.println("执行：getParameters！获得玩家的参数!");
         return (RHEAParams) parameters;
     }
 
@@ -40,6 +46,9 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
     @Override
     public void initializePlayer(AbstractGameState state) {
         System.out.println("执行：initializePlayer！初始化玩家!");
+
+        this.prevBestValue = Double.NEGATIVE_INFINITY;
+
         MASTStatistics = new ArrayList<>();//创建 MASTStatistics（多臂老虎机算法的统计数据）用于记录动作的访问次数和累计价值
         for (int i = 0; i < state.getNPlayers(); i++)
             MASTStatistics.add(new HashMap<>());
@@ -240,6 +249,25 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
         throw new RuntimeException("Random Generator generated an invalid goal, goal: " + ran + " p: " + p);
     }
 
+
+    private void adjustMutationRate(RHEAParams params) {
+        prevBestValue = currentBestValue;
+        currentBestValue = population.get(0).value;
+        // 根据当前表现调整突变率
+        if (currentBestValue > prevBestValue) {
+            // 如果当前最优值提升，则减少突变率（更趋向于利用）
+            params.mutationCount = Math.max((int)(params.mutationCount * decreaseFactor), (int) minMutationCount);
+            System.out.println("减少 突变率");
+        } else if(currentBestValue < prevBestValue){
+            // 如果当前最优值没有提升，则增加突变率（更趋向于探索）
+            params.mutationCount = Math.min((int)(params.mutationCount * increaseFactor), (int) maxMutationCount);
+            System.out.println("增加 突变率");
+        }
+        // 更新前一个最佳值
+        System.out.println("调整突变率: 当前最优值 = " + currentBestValue + ", 之前最优值 = " + prevBestValue
+                + ", 新的突变次数 = " + params.mutationCount);
+    }
+
     /**
      * Run evolutionary process for one generation
      * 进行一代演化，包括精英保留、交叉操作、变异操作、修复操作（如果需要），并通过 MAST 更新统计数据。最后更新种群和预算。
@@ -248,6 +276,7 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
         System.out.println("执行：runIteration！优化种群!");
         //copy elites
         RHEAParams params = getParameters();
+//        adjustMutationRate(params);
         List<RHEAIndividual> newPopulation = new ArrayList<>();
         for (int i = 0, max = Math.min(params.eliteCount, population.size()); i < max; ++i) {
             newPopulation.add(new RHEAIndividual(population.get(i)));
@@ -258,7 +287,7 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
             RHEAIndividual child = crossover(parents[0], parents[1]);
             population.add(child);
         }
-
+        // 突变与备份操作
         for (RHEAIndividual individual : population) {
             Pair<Integer, Integer> calls = individual.mutate(getForwardModel(), getPlayerID(), params.mutationCount);
             fmCalls += calls.a;
