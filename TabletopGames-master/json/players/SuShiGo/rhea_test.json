@@ -1,5 +1,5 @@
 {
-	"class" : "players.rhea.RHEAParams",
+	"class" : "players.GroupD.RHEAParams",
 	"horizon": 7,
 	"discountFactor": 0.900,
 	"populationSize": 14,

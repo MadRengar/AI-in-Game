@@ -30,23 +30,16 @@ rhea won 24.0% of the 50 games against rhea_test.
 
 rhea_test got 38.00 points. rhea_test won 76.0% of the 50 games of the tournament. rhea_test won 76.0% of the 50 games it played during the tournament.
 rhea_test won 76.0% of the 50 games against rhea.
-
-
-rhea got 26.00 points. rhea won 52.0% of the 50 games of the tournament. rhea won 52.0% of the 50 games it played during the tournament.
-rhea won 52.0% of the 50 games against rhea_test.
-
-rhea_test got 24.00 points. rhea_test won 48.0% of the 50 games of the tournament. rhea_test won 48.0% of the 50 games it played during the tournament.
-rhea_test won 48.0% of the 50 games against rhea.
-
+//----------------------Test_两个rhea对战------------------------------//
 
 Game: SushiGo, Players: 2, Mode: RANDOM, TotalGames: 50, GamesPerMatchup: 1
-rhea got 18.50 points. rhea won 36.0% of the 50 games of the tournament. rhea won 36.0% of the 50 games it played during the tournament.
-rhea won 36.0% of the 50 games against rhea_test.
+rhea got 20.00 points. rhea won 40.0% of the 50 games of the tournament. rhea won 40.0% of the 50 games it played during the tournament.
+rhea won 40.0% of the 50 games against rhea_test.
 
-rhea_test got 31.50 points. rhea_test won 62.0% of the 50 games of the tournament. rhea_test won 62.0% of the 50 games it played during the tournament.
-rhea_test won 62.0% of the 50 games against rhea.
+rhea_test got 30.00 points. rhea_test won 60.0% of the 50 games of the tournament. rhea_test won 60.0% of the 50 games it played during the tournament.
+rhea_test won 60.0% of the 50 games against rhea.
 
 ---- Ranking ---- (+/- are standard errors on the mean calculated using a Normal approximation) 
-rhea_test: Win rate 0.63 +/- 0.068	Mean Ordinal 1.36 +/- 0.07
-rhea: Win rate 0.37 +/- 0.068	Mean Ordinal 1.62 +/- 0.07
+rhea_test: Win rate 0.60 +/- 0.069	Mean Ordinal 1.40 +/- 0.07
+rhea: Win rate 0.40 +/- 0.069	Mean Ordinal 1.60 +/- 0.07
 
