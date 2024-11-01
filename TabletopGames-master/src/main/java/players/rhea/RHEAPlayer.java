@@ -45,7 +45,6 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
     /**初始化玩家**/
     @Override
     public void initializePlayer(AbstractGameState state) {
-        System.out.println("执行：initializePlayer！初始化玩家!");
 
         this.prevBestValue = Double.NEGATIVE_INFINITY;
 
@@ -57,7 +56,6 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
     /**这是关键的决策函数，在游戏状态下通过演化算法选择下一步的动作**/
     @Override
     public AbstractAction _getAction(AbstractGameState stateObs, List<AbstractAction> possibleActions) {
-        System.out.println("执行：_getAction！选择下一步的动作!");
         ElapsedCpuTimer timer = new ElapsedCpuTimer();  // New timer for this game tick使用定时器 ElapsedCpuTimer 来确保算法不会超时
         timer.setMaxTimeMillis(parameters.budget);
         numIters = 0;
@@ -124,7 +122,6 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
      * 根据不同的预算类型（时间、前向模型调用次数等）来判断是否继续迭代。
      * **/
     private boolean budgetLeft(ElapsedCpuTimer timer) {
-        System.out.println("执行：检查剩余预算！");
         RHEAParams params = getParameters();
         if (params.budgetType == PlayerConstants.BUDGET_TIME) {
             long remaining = timer.remainingTimeMillis();
@@ -249,34 +246,13 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
         throw new RuntimeException("Random Generator generated an invalid goal, goal: " + ran + " p: " + p);
     }
 
-
-    private void adjustMutationRate(RHEAParams params) {
-        prevBestValue = currentBestValue;
-        currentBestValue = population.get(0).value;
-        // 根据当前表现调整突变率
-        if (currentBestValue > prevBestValue) {
-            // 如果当前最优值提升，则减少突变率（更趋向于利用）
-            params.mutationCount = Math.max((int)(params.mutationCount * decreaseFactor), (int) minMutationCount);
-            System.out.println("减少 突变率");
-        } else if(currentBestValue < prevBestValue){
-            // 如果当前最优值没有提升，则增加突变率（更趋向于探索）
-            params.mutationCount = Math.min((int)(params.mutationCount * increaseFactor), (int) maxMutationCount);
-            System.out.println("增加 突变率");
-        }
-        // 更新前一个最佳值
-        System.out.println("调整突变率: 当前最优值 = " + currentBestValue + ", 之前最优值 = " + prevBestValue
-                + ", 新的突变次数 = " + params.mutationCount);
-    }
-
     /**
      * Run evolutionary process for one generation
      * 进行一代演化，包括精英保留、交叉操作、变异操作、修复操作（如果需要），并通过 MAST 更新统计数据。最后更新种群和预算。
      */
     private void runIteration() {
-        System.out.println("执行：runIteration！优化种群!");
         //copy elites
         RHEAParams params = getParameters();
-//        adjustMutationRate(params);
         List<RHEAIndividual> newPopulation = new ArrayList<>();
         for (int i = 0, max = Math.min(params.eliteCount, population.size()); i < max; ++i) {
             newPopulation.add(new RHEAIndividual(population.get(i)));
@@ -315,7 +291,6 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
 
     /**更新 MASTStatistics，即记录每个动作的访问次数和累计价值，用于多臂老虎机算法的改进。**/
     protected void MASTBackup(AbstractAction[] rolloutActions, double delta, int player) {
-        System.out.println("执行：MASTBackup！记录每个动作的访问次数和累计价值！");
         for (int i = 0; i < rolloutActions.length; i++) {
             AbstractAction action = rolloutActions[i];
             if (action == null)
@@ -330,14 +305,12 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
     /**设置该玩家的预算（如时间、调用次数等），并将其保存到参数中。**/
     @Override
     public void setBudget(int budget) {
-        System.out.println("执行：setBudget！设置该玩家的预算！");
         parameters.budget = budget;
         parameters.setParameterValue("budget", budget);
     }
     /**返回玩家当前的预算值。**/
     @Override
     public int getBudget() {
-        System.out.println("执行：getBudget！返回玩家当前的预算值！");
         return parameters.budget;
     }
 }

@@ -4,6 +4,7 @@ import core.AbstractGameState;
 import core.interfaces.IStateHeuristic;
 import evaluation.optimisation.TunableParameters;
 import players.PlayerParameters;
+import players.heuristics.ScoreHeuristic;
 
 import java.util.Arrays;
 /**RHEAParams.java
@@ -25,6 +26,8 @@ public class RHEAParams extends PlayerParameters
     public IStateHeuristic heuristic = AbstractGameState::getGameScore;
     public boolean useMAST;//是否使用MAST（Move-Average Sampling Technique）来辅助搜索。
 
+    public int numSimulations = 50; // 默认设置为10，可以根据需要调整
+
     /**构造函数，用于定义和初始化 RHEA 算法中的可调参数，并为每个参数设定默认值和可能的取值范围。**/
     public RHEAParams() {
         //每个参数都有一个默认值（如 horizon 的默认值是 10），以及一组可选值（如 Arrays.asList(1, 3, 5, 10, 20, 30)）。
@@ -39,6 +42,7 @@ public class RHEAParams extends PlayerParameters
         addTunableParameter("shiftLeft", false, Arrays.asList(false, true));
         addTunableParameter("mutationCount", 1, Arrays.asList(1, 3, 10));
         addTunableParameter("heuristic", (IStateHeuristic) AbstractGameState::getGameScore);
+//        addTunableParameter("heuristic", new ScoreHeuristic());
         addTunableParameter("useMAST", false, Arrays.asList(false, true));
     }
 

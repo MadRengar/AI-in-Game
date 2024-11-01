@@ -45,7 +45,7 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
     /**初始化玩家**/
     @Override
     public void initializePlayer(AbstractGameState state) {
-        System.out.println("Test执行：initializePlayer！初始化玩家!");
+//        System.out.println("Test执行：initializePlayer！初始化玩家!");
 
         this.prevBestValue = Double.NEGATIVE_INFINITY;
 
@@ -57,7 +57,7 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
     /**这是关键的决策函数，在游戏状态下通过演化算法选择下一步的动作**/
     @Override
     public AbstractAction _getAction(AbstractGameState stateObs, List<AbstractAction> possibleActions) {
-        System.out.println("Test执行：_getAction！选择下一步的动作!");
+//        System.out.println("Test执行：_getAction！选择下一步的动作!");
         ElapsedCpuTimer timer = new ElapsedCpuTimer();  // New timer for this game tick使用定时器 ElapsedCpuTimer 来确保算法不会超时
         timer.setMaxTimeMillis(parameters.budget);
         numIters = 0;
@@ -104,6 +104,9 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
         }
 
         population.sort(Comparator.naturalOrder());
+
+        System.out.println("当前最高适应度个体的适应度值: "+ population.get(0).value);
+
         initTime = timer.elapsedMillis();
         // Run evolution
         /**演化过程：每轮迭代会调用 runIteration 函数来优化种群**/
@@ -124,7 +127,7 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
      * 根据不同的预算类型（时间、前向模型调用次数等）来判断是否继续迭代。
      * **/
     private boolean budgetLeft(ElapsedCpuTimer timer) {
-        System.out.println("Test执行：检查剩余预算！");
+//        System.out.println("Test执行：检查剩余预算！");
         RHEAParams params = getParameters();
         if (params.budgetType == PlayerConstants.BUDGET_TIME) {
             long remaining = timer.remainingTimeMillis();
@@ -249,6 +252,103 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
         throw new RuntimeException("Random Generator generated an invalid goal, goal: " + ran + " p: " + p);
     }
 
+    /**
+     * Run evolutionary process for one generation
+     * 进行一代演化，包括精英保留、交叉操作、变异操作、修复操作（如果需要），并通过 MAST 更新统计数据。最后更新种群和预算。
+     */
+    private void runIteration() {
+//        System.out.println("Test执行：runIteration！优化种群!");
+
+        // 在每次迭代开始时更新阈值
+        double averageFitness = population.stream()
+                .mapToDouble(individual -> individual.value)
+                .average()
+                .orElse(0);
+        double threshold = averageFitness * 0.9; // 设置阈值为平均适应度的90%
+
+
+        //copy elites
+        RHEAParams params = getParameters();
+//        adjustMutationRate(params);
+        List<RHEAIndividual> newPopulation = new ArrayList<>();
+
+        for (int i = 0, max = Math.min(params.eliteCount, population.size()); i < max; ++i) {
+            newPopulation.add(new RHEAIndividual(population.get(i)));
+        }
+        //crossover
+        for (int i = 0; i < params.childCount; ++i) {
+            RHEAIndividual[] parents = selectParents();
+
+
+            // 剪枝策略：仅当适应度高于某个阈值时进行交叉
+//            if (parents[0].value > threshold && parents[1].value > threshold) {
+                RHEAIndividual child = crossover(parents[0], parents[1]);
+                population.add(child);
+//            }
+        }
+        // 突变与备份操作
+        for (RHEAIndividual individual : population) {
+//            if (individual.value > threshold) {
+                Pair<Integer, Integer> calls = individual.mutate(getForwardModel(), getPlayerID(), params.mutationCount);
+                fmCalls += calls.a;
+                copyCalls += calls.b;
+                repairCount += individual.repairCount;
+                nonRepairCount += individual.nonRepairCount;
+                if (params.useMAST)
+                    MASTBackup(individual.actions, individual.value, getPlayerID());
+//            }
+        }
+
+        //sort
+        population.sort(Comparator.naturalOrder());
+
+        //best ones get moved to the new population
+        for (int i = 0; i < Math.min(population.size(), params.populationSize - params.eliteCount); ++i) {
+            newPopulation.add(population.get(i));
+        }
+
+        population = newPopulation;
+
+        population.sort(Comparator.naturalOrder());
+        // Update budgets
+        numIters++;
+
+
+//        if (population.get(0).value > prevBestValue) {
+//            threshold *= 1.1; // 如果当前最优个体的适应度提高，增加阈值
+//        } else {
+//            threshold *= 0.9; // 如果没有提高，降低阈值
+//        }
+//        prevBestValue = population.get(0).value; // 更新最优适应度值
+    }
+
+    /**更新 MASTStatistics，即记录每个动作的访问次数和累计价值，用于多臂老虎机算法的改进。**/
+    protected void MASTBackup(AbstractAction[] rolloutActions, double delta, int player) {
+//        System.out.println("Test执行：MASTBackup！记录每个动作的访问次数和累计价值！");
+        for (int i = 0; i < rolloutActions.length; i++) {
+            AbstractAction action = rolloutActions[i];
+            if (action == null)
+                break;
+            Pair<Integer, Double> stats = MASTStatistics.get(player).getOrDefault(action, new Pair<>(0, 0.0));
+            stats.a++;  // visits
+            stats.b += delta;   // value
+            MASTStatistics.get(player).put(action.copy(), stats);
+        }
+    }
+
+    /**设置该玩家的预算（如时间、调用次数等），并将其保存到参数中。**/
+    @Override
+    public void setBudget(int budget) {
+//        System.out.println("Test执行：setBudget！设置该玩家的预算！");
+        parameters.budget = budget;
+        parameters.setParameterValue("budget", budget);
+    }
+    /**返回玩家当前的预算值。**/
+    @Override
+    public int getBudget() {
+//        System.out.println("Test执行：getBudget！返回玩家当前的预算值！");
+        return parameters.budget;
+    }
 
     private void adjustMutationRate(RHEAParams params) {
         prevBestValue = currentBestValue;
@@ -268,76 +368,23 @@ public class RHEAPlayer extends AbstractPlayer implements IAnyTimePlayer {
                 + ", 新的突变次数 = " + params.mutationCount);
     }
 
-    /**
-     * Run evolutionary process for one generation
-     * 进行一代演化，包括精英保留、交叉操作、变异操作、修复操作（如果需要），并通过 MAST 更新统计数据。最后更新种群和预算。
-     */
-    private void runIteration() {
-        System.out.println("Test执行：runIteration！优化种群!");
-        //copy elites
-        RHEAParams params = getParameters();
-        adjustMutationRate(params);
-        List<RHEAIndividual> newPopulation = new ArrayList<>();
-        for (int i = 0, max = Math.min(params.eliteCount, population.size()); i < max; ++i) {
-            newPopulation.add(new RHEAIndividual(population.get(i)));
+    public double monteCarloRollout(AbstractGameState initialState, int playerID, int numSimulations, RHEAParams params) {
+        double totalScore = 0;
+        for (int i = 0; i < numSimulations; i++) {
+            AbstractGameState clonedState = initialState.copy();
+            int depth = 0;
+            while (clonedState.isNotTerminal() && depth < params.horizon) {
+                List<AbstractAction> actions = getForwardModel().computeAvailableActions(clonedState);
+                AbstractAction action = actions.get(rnd.nextInt(actions.size()));
+                getForwardModel().next(clonedState, action);
+                depth++;
+            }
+            // 使用 ScoreHeuristic 评估最终得分
+            totalScore += params.heuristic.evaluateState(clonedState, playerID);
         }
-        //crossover
-        for (int i = 0; i < params.childCount; ++i) {
-            RHEAIndividual[] parents = selectParents();
-            RHEAIndividual child = crossover(parents[0], parents[1]);
-            population.add(child);
-        }
-        // 突变与备份操作
-        for (RHEAIndividual individual : population) {
-            Pair<Integer, Integer> calls = individual.mutate(getForwardModel(), getPlayerID(), params.mutationCount);
-            fmCalls += calls.a;
-            copyCalls += calls.b;
-            repairCount += individual.repairCount;
-            nonRepairCount += individual.nonRepairCount;
-            if (params.useMAST)
-                MASTBackup(individual.actions, individual.value, getPlayerID());
-        }
-
-        //sort
-        population.sort(Comparator.naturalOrder());
-
-        //best ones get moved to the new population
-        for (int i = 0; i < Math.min(population.size(), params.populationSize - params.eliteCount); ++i) {
-            newPopulation.add(population.get(i));
-        }
-
-        population = newPopulation;
-
-        population.sort(Comparator.naturalOrder());
-        // Update budgets
-        numIters++;
+        return totalScore / numSimulations;
     }
 
-    /**更新 MASTStatistics，即记录每个动作的访问次数和累计价值，用于多臂老虎机算法的改进。**/
-    protected void MASTBackup(AbstractAction[] rolloutActions, double delta, int player) {
-        System.out.println("Test执行：MASTBackup！记录每个动作的访问次数和累计价值！");
-        for (int i = 0; i < rolloutActions.length; i++) {
-            AbstractAction action = rolloutActions[i];
-            if (action == null)
-                break;
-            Pair<Integer, Double> stats = MASTStatistics.get(player).getOrDefault(action, new Pair<>(0, 0.0));
-            stats.a++;  // visits
-            stats.b += delta;   // value
-            MASTStatistics.get(player).put(action.copy(), stats);
-        }
-    }
 
-    /**设置该玩家的预算（如时间、调用次数等），并将其保存到参数中。**/
-    @Override
-    public void setBudget(int budget) {
-        System.out.println("Test执行：setBudget！设置该玩家的预算！");
-        parameters.budget = budget;
-        parameters.setParameterValue("budget", budget);
-    }
-    /**返回玩家当前的预算值。**/
-    @Override
-    public int getBudget() {
-        System.out.println("Test执行：getBudget！返回玩家当前的预算值！");
-        return parameters.budget;
-    }
+
 }

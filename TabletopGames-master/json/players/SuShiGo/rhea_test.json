@@ -1,14 +1,17 @@
 {
 	"class" : "players.GroupD.RHEAParams",
-	"horizon": 7,
+	"horizon": 10,
 	"discountFactor": 0.900,
-	"populationSize": 14,
+	"populationSize": 10,
 	"childCount": 10,
 	"crossoverType": "UNIFORM",
 	"eliteCount": 2,
 	"selectionType" : "TOURNAMENT",
 	"tournamentSize" : 5,
 	"budgetType" : "BUDGET_TIME",
-	"budget" : 50,
-	"breakMS" : 0
+	"budget" : 5000,
+	"breakMS" : 0,
+	"heuristic" : {
+		"class" : "players.heuristics.ScoreHeuristic"
+	}
 }
